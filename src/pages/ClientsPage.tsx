@@ -95,7 +95,7 @@ function ClientsPage() {
     }, []);
 
     /* fetch clients */
-    const fetchData = useCallback(async () => {
+    const fetchData = useCallback(async (signal?: { cancelled: boolean }) => {
         setLoading(true);
         try {
             const params: Record<string, unknown> = { page, pageSize };
@@ -107,18 +107,21 @@ function ClientsPage() {
                 params.commercialId = authCommercialId;
             }
             const result = await clientService.getAll(params as Parameters<typeof clientService.getAll>[0]);
+            if (signal?.cancelled) return;
             setClients(result.data);
             setTotalPages(result.totalPages);
             setTotalCount(result.totalCount);
         } catch {
-            toast.error('Erreur lors du chargement des clients');
+            if (!signal?.cancelled) toast.error('Erreur lors du chargement des clients');
         } finally {
-            setLoading(false);
+            if (!signal?.cancelled) setLoading(false);
         }
     }, [page, filterSector, filterStatus, filterCommercialId, isAdminOrSupervisor, authCommercialId]);
 
     useEffect(() => {
-        fetchData();
+        const signal = { cancelled: false };
+        fetchData(signal);
+        return () => { signal.cancelled = true; };
     }, [fetchData]);
 
     /* reset page on filter change */

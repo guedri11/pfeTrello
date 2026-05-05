@@ -32,6 +32,7 @@ function DashboardPage() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        let cancelled = false;
         const load = async () => {
             try {
                 const [summaryData, trendData, perfData] = await Promise.all([
@@ -41,16 +42,18 @@ function DashboardPage() {
                         ? dashboardService.getPerformance()
                         : Promise.resolve([]),
                 ]);
+                if (cancelled) return;
                 setSummary(summaryData);
                 setTrend(trendData);
                 setPerformance(perfData);
             } catch {
-                toast.error('Erreur lors du chargement du tableau de bord');
+                if (!cancelled) toast.error('Erreur lors du chargement du tableau de bord');
             } finally {
-                setLoading(false);
+                if (!cancelled) setLoading(false);
             }
         };
         load();
+        return () => { cancelled = true; };
     }, [isAdminOrSupervisor]);
 
     if (loading) {

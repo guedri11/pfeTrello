@@ -70,22 +70,25 @@ function CommercialsPage() {
     const [confirmDelete, setConfirmDelete] = useState<CommercialDto | null>(null);
 
     /* fetch */
-    const fetchData = useCallback(async () => {
+    const fetchData = useCallback(async (signal?: { cancelled: boolean }) => {
         setLoading(true);
         try {
             const result = await commercialService.getAll(page, pageSize);
+            if (signal?.cancelled) return;
             setCommercials(result.data);
             setTotalPages(result.totalPages);
             setTotalCount(result.totalCount);
         } catch {
-            toast.error('Erreur lors du chargement des commerciaux');
+            if (!signal?.cancelled) toast.error('Erreur lors du chargement des commerciaux');
         } finally {
-            setLoading(false);
+            if (!signal?.cancelled) setLoading(false);
         }
     }, [page]);
 
     useEffect(() => {
-        fetchData();
+        const signal = { cancelled: false };
+        fetchData(signal);
+        return () => { signal.cancelled = true; };
     }, [fetchData]);
 
     /* filtered list */

@@ -95,24 +95,27 @@ function TasksPage() {
         useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
     );
 
-    const fetchData = useCallback(async () => {
+    const fetchData = useCallback(async (signal?: { cancelled: boolean }) => {
         setLoading(true);
         try {
             const [taskData, commercialData] = await Promise.all([
                 taskService.getAll(),
                 commercialService.getAll(1, 100),
             ]);
+            if (signal?.cancelled) return;
             setTasks(taskData);
             setCommercials(commercialData.data);
         } catch {
-            toast.error('Erreur lors du chargement des tâches');
+            if (!signal?.cancelled) toast.error('Erreur lors du chargement des tâches');
         } finally {
-            setLoading(false);
+            if (!signal?.cancelled) setLoading(false);
         }
     }, []);
 
     useEffect(() => {
-        fetchData();
+        const signal = { cancelled: false };
+        fetchData(signal);
+        return () => { signal.cancelled = true; };
     }, [fetchData]);
 
     /* Group tasks by column, sorted by order */

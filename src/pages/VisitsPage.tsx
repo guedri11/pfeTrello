@@ -235,7 +235,7 @@ function VisitsPage() {
     }, []);
 
     /* ── fetch visits ── */
-    const fetchVisits = useCallback(async () => {
+    const fetchVisits = useCallback(async (signal?: { cancelled: boolean }) => {
         setLoading(true);
         try {
             const params: Record<string, unknown> = {
@@ -251,17 +251,20 @@ function VisitsPage() {
             const result = await visitService.getAll(
                 params as Parameters<typeof visitService.getAll>[0]
             );
+            if (signal?.cancelled) return;
             setVisits(result.data);
             setTotalPages(result.totalPages);
         } catch {
-            toast.error('Erreur lors du chargement des visites');
+            if (!signal?.cancelled) toast.error('Erreur lors du chargement des visites');
         } finally {
-            setLoading(false);
+            if (!signal?.cancelled) setLoading(false);
         }
     }, [page, view, filterStatus, filterFrom, filterTo, isAdminOrSupervisor, authCommercialId]);
 
     useEffect(() => {
-        fetchVisits();
+        const signal = { cancelled: false };
+        fetchVisits(signal);
+        return () => { signal.cancelled = true; };
     }, [fetchVisits]);
 
     /* ── Kanban helpers ── */
