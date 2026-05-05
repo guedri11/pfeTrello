@@ -154,7 +154,7 @@ export interface CreateTaskRequest {
     assignedToId?: number;
     column: TaskColumn;
     priority: TaskPriority;
-    dueDate?: string;
+    dueDate: string;
 }
 
 export interface UpdateTaskRequest {

@@ -10,6 +10,7 @@ import {
     Plus,
     Pencil,
     UserX,
+    Trash2,
     Search,
     ChevronLeft,
     ChevronRight,
@@ -66,6 +67,7 @@ function CommercialsPage() {
     const [modalOpen, setModalOpen] = useState(false);
     const [editing, setEditing] = useState<CommercialDto | null>(null);
     const [confirmDeactivate, setConfirmDeactivate] = useState<CommercialDto | null>(null);
+    const [confirmDelete, setConfirmDelete] = useState<CommercialDto | null>(null);
 
     /* fetch */
     const fetchData = useCallback(async () => {
@@ -118,6 +120,18 @@ function CommercialsPage() {
             fetchData();
         } catch {
             toast.error('Erreur lors de la désactivation');
+        }
+    };
+
+    const handleDelete = async () => {
+        if (!confirmDelete) return;
+        try {
+            await commercialService.delete(confirmDelete.id);
+            toast.success('Commercial supprimé définitivement');
+            setConfirmDelete(null);
+            fetchData();
+        } catch {
+            toast.error('Erreur lors de la suppression');
         }
     };
 
@@ -228,6 +242,13 @@ function CommercialsPage() {
                                                             <UserX className="w-4 h-4" />
                                                         </button>
                                                     )}
+                                                    <button
+                                                        onClick={() => setConfirmDelete(c)}
+                                                        className="p-1.5 rounded-lg text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors"
+                                                        title="Supprimer"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
                                                 </div>
                                             )}
                                         </td>
@@ -284,6 +305,15 @@ function CommercialsPage() {
                     message={`Désactiver ${confirmDeactivate.firstName} ${confirmDeactivate.lastName} ?`}
                     onConfirm={handleDeactivate}
                     onCancel={() => setConfirmDeactivate(null)}
+                />
+            )}
+
+            {/* Delete confirmation */}
+            {confirmDelete && (
+                <ConfirmDialog
+                    message={`Supprimer définitivement ${confirmDelete.firstName} ${confirmDelete.lastName} ? Cette action est irréversible et supprimera toutes les données associées (clients, visites).`}
+                    onConfirm={handleDelete}
+                    onCancel={() => setConfirmDelete(null)}
                 />
             )}
         </div>

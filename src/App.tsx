@@ -28,6 +28,14 @@ function AdminRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function AdminOrSupervisorRoute({ children }: { children: React.ReactNode }) {
+  const role = useAuthStore((s) => s.role);
+  const accessToken = useAuthStore((s) => s.accessToken);
+  if (!accessToken) return <Navigate to="/login" replace />;
+  if (role !== 'Admin' && role !== 'Supervisor') return <Navigate to="/dashboard" replace />;
+  return <>{children}</>;
+}
+
 function App() {
   return (
     <BrowserRouter>
@@ -49,9 +57,9 @@ function App() {
             <Route
               path="commercials"
               element={
-                <AdminRoute>
+                <AdminOrSupervisorRoute>
                   <CommercialsPage />
-                </AdminRoute>
+                </AdminOrSupervisorRoute>
               }
             />
             <Route path="clients" element={<ClientsPage />} />

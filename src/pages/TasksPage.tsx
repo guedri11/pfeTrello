@@ -63,7 +63,7 @@ const createSchema = z.object({
     assignedToId: z.number().optional(),
     column: z.enum(['Todo', 'InProgress', 'Done'] as const),
     priority: z.enum(['Low', 'Medium', 'High', 'Critical'] as const),
-    dueDate: z.string().optional(),
+    dueDate: z.string().min(1, 'La date d\'échéance est obligatoire'),
 });
 
 const updateSchema = z.object({
@@ -150,8 +150,12 @@ function TasksPage() {
 
         try {
             await taskService.move(taskId, { column: targetColumn, order: newOrder });
-        } catch {
-            toast.error('Erreur lors du déplacement');
+        } catch (err: any) {
+            if (err?.response?.status === 403) {
+                toast.error('Déplacement non autorisé — vous ne pouvez déplacer que vos propres tâches');
+            } else {
+                toast.error('Erreur lors du déplacement');
+            }
             fetchData();
         }
     };

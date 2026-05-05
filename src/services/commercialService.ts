@@ -27,6 +27,9 @@ export const commercialService = {
     deactivate: (id: number) =>
         api.patch(`/commercial/${id}/deactivate`).then((r) => r.data),
 
+    delete: (id: number) =>
+        api.delete(`/commercial/${id}`).then((r) => r.data),
+
     getPerformance: (id: number) =>
         api
             .get<CommercialPerformanceDto>(`/commercial/${id}/performance`)
