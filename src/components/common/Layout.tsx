@@ -74,7 +74,7 @@ function Layout() {
                 )}
             >
                 <div className="flex items-center justify-between p-6 border-b border-primary-700">
-                    <span className="text-xl font-bold">PFE Trello</span>
+                    <span className="text-xl font-bold">VisioPro</span>
                     <button
                         className="md:hidden"
                         onClick={() => setMobileOpen(false)}

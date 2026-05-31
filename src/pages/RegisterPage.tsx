@@ -51,7 +51,7 @@ function RegisterPage() {
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-900 to-primary-700 p-4">
             <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8">
                 <div className="text-center mb-6">
-                    <h1 className="text-3xl font-bold text-primary-900">PFE Trello</h1>
+                    <h1 className="text-3xl font-bold text-primary-900">VisioPro</h1>
                     <p className="text-gray-500 mt-2">Créer un compte</p>
                 </div>
 
